@@ -3,11 +3,11 @@ end
 
 class Board
 
-	attr_accessor :board, :solution, :turns
+	attr_accessor :board, :turns
 
 	def initialize(number_turns)
 		@turns = number_turns
-		@solution = [1.to_s, 2.to_s, 3.to_s ,4.to_s ]#[ rand(7).to_s , rand(7).to_s , rand(7).to_s , rand(7).to_s ]
+		@solution = ["1", "2", "3", "4" ]#[ rand(7).to_s , rand(7).to_s , rand(7).to_s , rand(7).to_s ]
 	end
 
 	# def random_color
@@ -52,15 +52,16 @@ class Board
 		current_turn = 1
 		display_board
 		guess(current_turn)
-		feedback(current_turn)
-		while current_turn < 12 && @solution != @board[current_turn]["guess"] #!winner(current_turn)
+		solu = @solution
+		feedback(current_turn, solu)
+		while current_turn < 12 && solu != @board[current_turn]["guess"] #!winner(current_turn)
 			current_turn += 1
 			display_board
 			guess(current_turn)
-			feedback(current_turn)
+			feedback(current_turn, solu)
 		end
 
-		if @board[current_turn]["guess"] == @solution
+		if @board[current_turn]["guess"] == solu
 			puts "Congratulations!!! You stopped the nuclear detonation!!"
 		else
 			puts "The bomb exploded!!!!"
@@ -68,22 +69,25 @@ class Board
 		end
 	end
 
-	def feedback(current_turn)
+	def feedback(current_turn, solution_arr_in)
+		# Tests for matching numbers and index, returns "b"
 		@board[current_turn]["guess"].each_with_index { |el, idx|
 			spot_open = feedback_el(current_turn)
-			if @solution[idx] == el && spot_open != false
+			if solution_arr_in[idx] == el && spot_open != false
 				@board[current_turn]["feedback"][spot_open] = "b"
 			end
 		}
 
-		solution_arr = @solution
-		current_arr = @board[current_turn]["guess"]
+		# tests for if the the number is in the solution, returns "w"
+		solution_arr = solution_arr_in
 		@board[current_turn]["guess"].each_with_index { |el, idx|
 			spot_open = feedback_el(current_turn)
-				if solution_arr.include?(el) && @solution[idx] != @board[current_turn]["guess"][idx] && spot_open != false
+				if solution_arr.include?(el) && solution_arr_in[idx] != el && spot_open != false 
 					@board[current_turn]["feedback"][spot_open] = "w"
+					solution_arr.delete_at(solution_arr.index(el))
 				end
 			}
+			print @solution
 
 	end
 
