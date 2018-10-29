@@ -4,6 +4,8 @@ class Computer
 	def initialize(number_turns)
 		@turns = number_turns
 		@solution_count = {}
+		@solution_numbers = []
+		@switcher = true
 		# @solution = [ rand(7).to_s , rand(7).to_s , rand(7).to_s , rand(7).to_s ]
 	end
 		
@@ -37,20 +39,31 @@ class Computer
 			puts string
 		end
 	end
+
 #computer guess
 	def guess(current_turn)
-		puts "Press enter to continue"
-		gets.chomp
-		if current_turn < 7 
+		# puts "Press enter to continue"
+		# gets.chomp
+		
+		if !solution_count_full?
 			computer_guess = [ current_turn.to_s, current_turn.to_s, current_turn.to_s, current_turn.to_s,]
-		elsif current_turn == 7
+		# elsif solution_count_full?
+		# 	solution_comp
+		# 	computer_guess = @solution_numbers
+		elsif @switcher
 			solution_comp
+			@switcher = false
 			computer_guess = @solution_numbers
-		elsif current_turn > 6
-			computer_guess = @solution_numbers.shuffle
+		else
+			computer_guess = @solution_numbers 
+			# computer_guess = @solution_numbers.dup
+			while guess_duplicate?(computer_guess)
+				computer_guess = computer_guess.shuffle
+			end
 		end
 		@board[current_turn]["guess"] = computer_guess
 	end
+
 	#counts number of instances of each number
 	def feedback_guess(current_turn)
 		if current_turn < 7
@@ -64,6 +77,14 @@ class Computer
 		end
 	end
 
+	def solution_count_full?
+		sum = 0
+		@solution_count.each do |number, count|
+			sum += count
+		end
+		sum >= 4
+	end
+
 	def solution_comp
 		solution_numbers = ""
 		@solution_count.each do |key, value|
@@ -73,9 +94,9 @@ class Computer
 		@solution_numbers = solution_numbers_a
 	end
 
-	def previous_guess?
-		@board.any? do |key, value|
-			
+	def guess_duplicate?(this_guess)
+		@board.any? do |guess_number, value|
+			value["guess"] == this_guess
 		end
 
 	end
@@ -92,7 +113,7 @@ class Computer
 		
 		while current_turn < 12 && @solution != @board[current_turn]["guess"] #!winner(current_turn)
 			current_turn += 1
-			display_board
+			# display_board
 			guess(current_turn)
 			feedback(current_turn)
 		end
@@ -134,10 +155,13 @@ class Computer
 
 	def game_end(current_turn)
 		if @board[current_turn]["guess"] == @solution
-			puts "Congratulations!!! You stopped the nuclear detonation!!"
+			puts "The computer beat you! "
+			puts "YOU LOSE"
 		else
 			puts "The bomb exploded!!!!"
-			puts "You Lose!"
+			puts "You defeated the evil computer"
+			puts "YOU WIN"
 		end
+		print @solution
 	end
 end
