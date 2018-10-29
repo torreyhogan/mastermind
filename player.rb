@@ -1,10 +1,9 @@
 class Player
 
 	attr_accessor :board, :turns
-	SOLSOL = ["4", "5", "6", "7"]
 	def initialize(number_turns)
 		@turns = number_turns
-		@solution = [ rand(7).to_s , rand(7).to_s , rand(7).to_s , rand(7).to_s ]
+		@solution = [ (rand(6) + 1).to_s , (rand(6) + 1).to_s , (rand(6) + 1).to_s , (rand(6) + 1).to_s ]
 	end
 		
 	def board_setup
@@ -15,9 +14,6 @@ class Player
 			j += 1
 		end
 	end
-
-
-		
 
 	def display_board
 		@board.each do |guess_number, value|
@@ -30,6 +26,7 @@ class Player
 				string += "#{item} "
 			}
 			puts string
+
 		end
 	end
 
@@ -46,20 +43,17 @@ class Player
 		display_board
 		guess(current_turn)
 		feedback(current_turn)
+		print @solution
 		while current_turn < 12 && @solution != @board[current_turn]["guess"] #!winner(current_turn)
 			current_turn += 1
 			display_board
 			guess(current_turn)
 			feedback(current_turn)
 		end
-
-		if @board[current_turn]["guess"] == @solution
-			puts "Congratulations!!! You stopped the nuclear detonation!!"
-		else
-			puts "The bomb exploded!!!!"
-			puts "You Lose!"
-		end
+		game_end(current_turn)
 	end
+
+
 
 	def feedback(current_turn)
 		# Tests for matching numbers and index, returns "b"
@@ -68,7 +62,9 @@ class Player
 			spot_open = feedback_el(current_turn)
 			if @solution[idx] == el && spot_open != false
 				@board[current_turn]["feedback"][spot_open] = "b"
+				solution_arr.delete_at(solution_arr.index(el))
 			end
+
 		end
 
 		# tests for if the the number is in the solution, returns "w"
@@ -89,5 +85,14 @@ class Player
 			end
 		end
 		false
+	end
+
+	def game_end(current_turn_temp)
+		if @board[current_turn_temp]["guess"] == @solution
+			puts "Congratulations!!! You stopped the nuclear detonation!!"
+		else
+			puts "The bomb exploded!!!!"
+			puts "You Lose!"
+		end
 	end
 end
